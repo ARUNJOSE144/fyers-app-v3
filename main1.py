@@ -1,8 +1,12 @@
 import datetime
 
 from colorama import init
-from fyers_api import fyersModel
-from fyers_api.Websocket import ws
+# from fyers_api import fyersModel
+# from fyers_api.Websocket import ws
+
+from fyers_apiv3 import fyersModel
+#from fyers_apiv3.Websocket import ws
+from fyers_apiv3.FyersWebsocket import order_ws
 
 from util import *
 
@@ -30,6 +34,7 @@ SYMBOL_FOR_LTP_MAP = props["SYMBOL_FOR_LTP_MAP"]
 
 write_log(json.dumps(fyers.tradebook()))
 write_log(json.dumps(fyers.orderbook()))
+write_log(json.dumps(fyers.positions()))
 
 
 def subscribe_to_symbol(symbol):
@@ -319,17 +324,17 @@ def custom_message(response):
     update_high_value_for_symbol()
 
 
-def run_process_background_symbol_data(access_token):
-    global fs
-    data_type = "symbolData"
-    symbol = SYMBOL_FOR_LTP_MAP
-    #symbol=['NSE:NIFTY241112150CE']
-    # print("Symbols : ", SYMBOL_FOR_LTP_MAP)
-    log_message("Symbols :  " + str(SYMBOL_FOR_LTP_MAP), 'INFO')
-    fs = ws.FyersSocket(access_token=access_token, run_background=False, log_path="/logs")
-    fs.websocket_data = custom_message
-    fs.subscribe(symbol=symbol, data_type=data_type)
-    fs.keep_running()
+# def run_process_background_symbol_data(access_token):
+#     global fs
+#     data_type = "symbolData"
+#     symbol = SYMBOL_FOR_LTP_MAP
+#     #symbol=['NSE:NIFTY241112150CE']
+#     # print("Symbols : ", SYMBOL_FOR_LTP_MAP)
+#     log_message("Symbols :  " + str(SYMBOL_FOR_LTP_MAP), 'INFO')
+#     fs = ws.FyersSocket(access_token=access_token, run_background=False, log_path="/logs")
+#     fs.websocket_data = custom_message
+#     fs.subscribe(symbol=symbol, data_type=data_type)
+#     fs.keep_running()
 
 
-run_process_background_symbol_data(ws_access_token)
+# run_process_background_symbol_data(ws_access_token)
