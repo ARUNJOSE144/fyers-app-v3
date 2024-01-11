@@ -1,0 +1,108 @@
+{
+  "app_id": "6Z6YOJ45VR-100",
+  "secret_id": "Q5IQ7FEUKK",
+  "redirect_url": "https://www.google.com/",
+  "show_logs": false,
+  "disclosedQty": 0,
+  "productType": "INTRADAY",
+  "validity": "DAY",
+  "offlineOrder": "False",
+  "json_reload_interval": 3,
+  "db_trade_reload_interval": 10,
+  "position_reload_interval": 10,
+  "file_trades_reload_interval": 10,
+  "ltp_match_interval": 1,
+  "enable_sound": true,
+  "strike_prefix": "23413",
+  "SYMBOL_FOR_LTP_MAP": [
+    "NSE:NIFTY50-INDEX",
+    "NSE:NIFTYBANK-INDEX",
+    "NSE:FINNIFTY-INDEX"
+  ],
+  "auto_trade_enabled": true,
+  "auto_trade_commons": {
+    "sl_percentage": 0.30,
+    "profit_percentage": 0.60
+  },
+  "auto_trade": [
+    {
+      "underlying_symbol": "RELIANCE",
+      "profit": "4244.45",
+      "sl": "4323.4",
+      "status": "active"
+    }
+  ],
+  "first_candle_same_trend_strategy": {
+    "symbols": [
+      {
+        "symbol": "NSE:INDUSINDBK-EQ",
+        "side": "SELL"
+      }
+    ],
+    "not_traded": true,
+    "time": "12:58:10",
+    "order_type": "1",
+    "stop_loss_percentage": 0.30,
+    "limit_percentage": 0.10,
+    "quantity": 1,
+    "retry_count_create_order": 2,
+    "reserved_balance_percentage": 2
+  },
+  "blind_trading_at_9_15": {
+    "symbols": [
+      {
+        "symbol": "NSE:M&M-EQ",
+        "side": "BUY"
+      }
+    ],
+    "not_traded": true,
+    "time": "09:00:00",
+    "order_type": "1",
+    "stop_loss_percentage": 0.30,
+    "limit_percentage": 0.01,
+    "quantity": 1,
+    "retry_count_create_order": 2,
+    "reserved_balance_percentage": 2
+  },
+  "info_space": {
+    "order_types": [
+      "1: Limit Order",
+      "2: Market Order",
+      "3: Stop Order / SL-M",
+      "4: Stop Limit Order/ SL-L"
+    ],
+    "product_types": [
+      "INTRADAY",
+      "CO",
+      "CNC",
+      "MARGIN",
+      "BO"
+    ]
+  },
+  "next_trade_gap": 10,
+  "new_position_time_interval": 2,
+  "active_position_check_interval": 5,
+  "symbol_stock_info": [
+    {
+      "symbol": "NSE:NIFTY50-INDEX",
+      "lot_size": 50,
+      "strike_displacement": 50
+    },
+    {
+      "symbol": "NSE:NIFTYBANK-INDEX",
+      "lot_size": 25,
+      "strike_displacement": 100
+    },
+    {
+      "symbol": "NSE:FINNIFTY-INDEX",
+      "lot_size": 40,
+      "strike_displacement": 50
+    }
+  ],
+  "chasing_values": [
+    7,
+    12,
+    30,
+    50
+  ]
+}

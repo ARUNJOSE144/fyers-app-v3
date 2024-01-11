@@ -1,0 +1,5 @@
+Python file_name.py      //For running the application from CMD
+
+pip freeze >> requirements.txt    //for loading the dependencys in a file
+
+pip install -r requirements.txt    //for installing all  the dependencys from a file
