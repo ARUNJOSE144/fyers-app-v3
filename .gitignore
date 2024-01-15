@@ -4,3 +4,6 @@ venv
 __pycache__/
 LOGS
 access_token
+
+fyersApi.log
+fyersDataSocket.log

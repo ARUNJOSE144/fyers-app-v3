@@ -6,7 +6,7 @@
   "disclosedQty": 0,
   "productType": "INTRADAY",
   "validity": "DAY",
-  "offlineOrder": "False",
+  "offlineOrder": false,
   "json_reload_interval": 3,
   "db_trade_reload_interval": 10,
   "position_reload_interval": 10,
@@ -100,9 +100,9 @@
     }
   ],
   "chasing_values": [
-    7,
-    12,
-    30,
-    50
+    0.10,
+    0.20,
+    0.30,
+    60
   ]
 }

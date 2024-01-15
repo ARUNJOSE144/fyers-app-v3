@@ -5,8 +5,7 @@ from colorama import init
 # from fyers_api.Websocket import ws
 
 from fyers_apiv3 import fyersModel
-#from fyers_apiv3.Websocket import ws
-from fyers_apiv3.FyersWebsocket import order_ws
+from fyers_apiv3.FyersWebsocket import data_ws
 
 from util import *
 
@@ -166,7 +165,7 @@ def round_to_nearest_0_05(decimal_value):
 
 def manage_Active_Position():
     global ACTIVE_POSITIONS
-    # print("LTP_DICT", LTP_DICT)
+    # print("LTP_DICT : ", LTP_DICT)
     threading.Timer(props["active_position_check_interval"], manage_Active_Position).start()
     print("TIME : ", datetime.now().strftime("%H:%M:%S"), " LTP Data : ", LTP_DICT)
     if len(ACTIVE_POSITIONS) > 0:
@@ -324,17 +323,81 @@ def custom_message(response):
     update_high_value_for_symbol()
 
 
-# def run_process_background_symbol_data(access_token):
-#     global fs
-#     data_type = "symbolData"
-#     symbol = SYMBOL_FOR_LTP_MAP
-#     #symbol=['NSE:NIFTY241112150CE']
-#     # print("Symbols : ", SYMBOL_FOR_LTP_MAP)
-#     log_message("Symbols :  " + str(SYMBOL_FOR_LTP_MAP), 'INFO')
-#     fs = ws.FyersSocket(access_token=access_token, run_background=False, log_path="/logs")
-#     fs.websocket_data = custom_message
-#     fs.subscribe(symbol=symbol, data_type=data_type)
-#     fs.keep_running()
+# =====================V3 WEB SOCKET=======================
 
 
-# run_process_background_symbol_data(ws_access_token)
+def onmessage(message):
+    # print("Response: onmessage", message)
+    # print("response Map", response)
+    if 'symbol' in message and 'ltp' in message:
+        LTP_DICT.update({message["symbol"]: message["ltp"]})
+        update_high_value_for_symbol()
+    if props["show_logs"]:
+        print("LTP Map", LTP_DICT)
+
+
+def onerror(message):
+    print("Error:", message)
+
+
+def onclose(message):
+    print("Connection closed:", message)
+
+
+def onopen():
+    """
+    Callback function to subscribe to data type and symbols upon WebSocket connection.
+
+    """
+    # Specify the data type and symbols you want to subscribe to
+    data_type = "SymbolUpdate"
+
+    # Subscribe to the specified symbols and data type
+    symbols = SYMBOL_FOR_LTP_MAP
+    fyersWeb.subscribe(symbols=symbols, data_type=data_type)
+
+    # Keep the socket running to receive real-time data
+    fyersWeb.keep_running()
+
+
+# Replace the sample access token with your actual access token obtained from Fyers
+access_token = ws_access_token
+
+# Create a FyersDataSocket instance with the provided parameters
+fyersWeb = data_ws.FyersDataSocket(
+    access_token=access_token,  # Access token in the format "appid:accesstoken"
+    log_path="",  # Path to save logs. Leave empty to auto-create logs in the current directory.
+    litemode=False,  # Lite mode disabled. Set to True if you want a lite response.
+    write_to_file=False,  # Save response in a log file instead of printing it.
+    reconnect=True,  # Enable auto-reconnection to WebSocket on disconnection.
+    on_connect=onopen,  # Callback function to subscribe to data upon connection.
+    on_close=onclose,  # Callback function to handle WebSocket connection close events.
+    on_error=onerror,  # Callback function to handle WebSocket errors.
+    on_message=onmessage  # Callback function to handle incoming messages from the WebSocket.
+)
+
+# Establish a connection to the Fyers WebSocket
+fyersWeb.connect()
+
+# {
+#     "ltp": 606.4,
+#     "vol_traded_today": 3045212,
+#     "last_traded_time": 1690953622,
+#     "exch_feed_time": 1690953622,
+#     "bid_size": 2081,
+#     "ask_size": 903,
+#     "bid_price": 606.4,
+#     "ask_price": 606.45,
+#     "last_traded_qty": 5,
+#     "tot_buy_qty": 749960,
+#     "tot_sell_qty": 1092063,
+#     "avg_trade_price": 608.2,
+#     "low_price": 605.85,
+#     "high_price": 610.5,
+#     "open_price": 609.85,
+#     "prev_close_price": 620.2,
+#     "type": "sf",
+#     "symbol": "NSE:SBIN-EQ",
+#     "ch": -13.8,
+#     "chp": -2.23
+# }
