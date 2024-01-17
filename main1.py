@@ -8,6 +8,7 @@ from fyers_apiv3 import fyersModel
 from fyers_apiv3.FyersWebsocket import data_ws
 
 from util import *
+import time
 
 props = {}
 LTP_DICT = {}
@@ -17,6 +18,7 @@ ORDER_BOOK = []
 EXTERNAL_PENDING_TRADES = []
 LOCK = False
 trade_gap_counter = 0
+fyersWeb = ""
 
 counter = 0
 fs = ""
@@ -36,13 +38,12 @@ write_log(json.dumps(fyers.orderbook()))
 write_log(json.dumps(fyers.positions()))
 
 
-def subscribe_to_symbol(symbol):
-    global fs
-    if fs != "":
-        data_type = "symbolData"
-        # symbol = ["NSE:NIFTYBANK-INDEX"]
-        log_message("Adding symbol: " + str(symbol), 'INFO')
-        fs.subscribe(symbol=symbol, data_type=data_type)
+def subscribe_to_symbol(symbols):
+    global fyersWeb
+    if fyersWeb != "":
+        data_type = "SymbolUpdate"
+        log_message("Adding symbols: " + str(symbols), 'INFO')
+        fyersWeb.subscribe(symbols=symbols, data_type=data_type)
 
 
 def test_web_socekt():
@@ -52,9 +53,6 @@ def test_web_socekt():
     if counter != 1:
         new_symbol_thread = threading.Thread(target=subscribe_to_symbol)
         new_symbol_thread.start()
-
-
-# test_web_socekt()
 
 
 def load_property_from_file():
@@ -345,27 +343,18 @@ def onclose(message):
 
 
 def onopen():
-    """
-    Callback function to subscribe to data type and symbols upon WebSocket connection.
-
-    """
-    # Specify the data type and symbols you want to subscribe to
+    global fyersWeb
     data_type = "SymbolUpdate"
 
-    # Subscribe to the specified symbols and data type
+    print("Symbols  : ", SYMBOL_FOR_LTP_MAP)
     symbols = SYMBOL_FOR_LTP_MAP
     fyersWeb.subscribe(symbols=symbols, data_type=data_type)
 
-    # Keep the socket running to receive real-time data
     fyersWeb.keep_running()
 
 
-# Replace the sample access token with your actual access token obtained from Fyers
-access_token = ws_access_token
-
-# Create a FyersDataSocket instance with the provided parameters
 fyersWeb = data_ws.FyersDataSocket(
-    access_token=access_token,  # Access token in the format "appid:accesstoken"
+    access_token=ws_access_token,  # Access token in the format "appid:accesstoken"
     log_path="",  # Path to save logs. Leave empty to auto-create logs in the current directory.
     litemode=False,  # Lite mode disabled. Set to True if you want a lite response.
     write_to_file=False,  # Save response in a log file instead of printing it.
@@ -375,29 +364,4 @@ fyersWeb = data_ws.FyersDataSocket(
     on_error=onerror,  # Callback function to handle WebSocket errors.
     on_message=onmessage  # Callback function to handle incoming messages from the WebSocket.
 )
-
-# Establish a connection to the Fyers WebSocket
 fyersWeb.connect()
-
-# {
-#     "ltp": 606.4,
-#     "vol_traded_today": 3045212,
-#     "last_traded_time": 1690953622,
-#     "exch_feed_time": 1690953622,
-#     "bid_size": 2081,
-#     "ask_size": 903,
-#     "bid_price": 606.4,
-#     "ask_price": 606.45,
-#     "last_traded_qty": 5,
-#     "tot_buy_qty": 749960,
-#     "tot_sell_qty": 1092063,
-#     "avg_trade_price": 608.2,
-#     "low_price": 605.85,
-#     "high_price": 610.5,
-#     "open_price": 609.85,
-#     "prev_close_price": 620.2,
-#     "type": "sf",
-#     "symbol": "NSE:SBIN-EQ",
-#     "ch": -13.8,
-#     "chp": -2.23
-# }
