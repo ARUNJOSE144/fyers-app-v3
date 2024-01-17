@@ -6,7 +6,7 @@ from datetime import datetime
 import mysql.connector
 from colorama import Fore, Back
 from fyers_api import accessToken
-# from playsound import playsound
+from playsound import playsound
 from prettytable import PrettyTable
 
 from common import get_object_from_list, get_comma_separated_symbols, write_log
@@ -248,8 +248,7 @@ def get_obj_from_array(list, field_name, value):
 
 def play_audio(file_path):
     try:
-        print("Sound Play disabled")
-        # playsound(file_path)
+        playsound(file_path)
     except Exception as e:
         log_message("Error While playing alert", "WARNING")
 
