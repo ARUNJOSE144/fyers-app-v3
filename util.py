@@ -5,7 +5,7 @@ from datetime import datetime
 
 import mysql.connector
 from colorama import Fore, Back
-from fyers_api import accessToken
+from fyers_apiv3 import fyersModel
 from playsound import playsound
 from prettytable import PrettyTable
 
@@ -31,7 +31,7 @@ def get_access_token(props):
     d = now.strftime("%d-%m-%Y")
     file_name = "access_token/access_token_" + d + ".txt"
     if not os.path.exists(file_name):
-        session = accessToken.SessionModel(client_id=props["app_id"], secret_key=props["secret_id"],
+        session = fyersModel.SessionModel(client_id=props["app_id"], secret_key=props["secret_id"],
                                            redirect_uri=props["redirect_url"],
                                            response_type="code", grant_type="authorization_code")
         response = session.generate_authcode()

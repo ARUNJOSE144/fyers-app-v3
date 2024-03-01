@@ -13,7 +13,6 @@ charset-normalizer==3.3.2
 colorama==0.4.6
 fastjsonschema==2.19.1
 frozenlist==1.4.1
-fyers-apiv2==2.0.5
 fyers-apiv3==3.0.7
 idna==2.10
 jmespath==0.10.0
