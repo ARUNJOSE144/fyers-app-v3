@@ -36,6 +36,7 @@ SYMBOL_FOR_LTP_MAP = props["SYMBOL_FOR_LTP_MAP"]
 write_log(json.dumps(fyers.tradebook()))
 write_log(json.dumps(fyers.orderbook()))
 write_log(json.dumps(fyers.positions()))
+get_available_fund(fyers)
 
 
 def subscribe_to_symbol(symbols):
@@ -85,25 +86,31 @@ def check_for_the_trade_to_trigger():
     if LOCK is False and trade_gap_counter <= 0:
         LOCK = True
         for ext_trade in EXTERNAL_PENDING_TRADES:
-            if ext_trade["operator"] == ">=":
-                if ext_trade["symbol"] in LTP_DICT and LTP_DICT[ext_trade["symbol"]] >= float(ext_trade["price"]):
-                    trade_gap_counter = props["next_trade_gap"]
-                    update_status_by_id(ext_trade["id"], "Inprogress")
-                    start_trade(ext_trade)
+            trade_gap_counter = props["next_trade_gap"]
+            update_status_by_id(ext_trade["id"], "Inprogress")
+            start_trade(ext_trade)
 
-            if ext_trade["operator"] == "<=":
-                if ext_trade["symbol"] in LTP_DICT and LTP_DICT[ext_trade["symbol"]] <= float(ext_trade["price"]):
-                    trade_gap_counter = props["next_trade_gap"]
-                    update_status_by_id(ext_trade["id"], "Inprogress")
-                    start_trade(ext_trade)
+            # if ext_trade["operator"] == ">=":
+            #     if ext_trade["symbol"] in LTP_DICT and LTP_DICT[ext_trade["symbol"]] >= float(ext_trade["price"]):
+            #         trade_gap_counter = props["next_trade_gap"]
+            #         update_status_by_id(ext_trade["id"], "Inprogress")
+            #         start_trade(ext_trade)
+            #
+            # if ext_trade["operator"] == "<=":
+            #     if ext_trade["symbol"] in LTP_DICT and LTP_DICT[ext_trade["symbol"]] <= float(ext_trade["price"]):
+            #         trade_gap_counter = props["next_trade_gap"]
+            #         update_status_by_id(ext_trade["id"], "Inprogress")
+            #         start_trade(ext_trade)
         LOCK = False
 
 
 def start_trade(trade):
     global props
     global LOCK
-    strike = calculate_strike(props, trade, LTP_DICT)
-    response = create_order_single(props, fyers, strike, trade["qty"], 2, 1, 0,
+    # strike = calculate_strike(props, trade, LTP_DICT)
+    qty = calculate_qty(fyers, props, trade)
+    limit_price= float(trade["price"])
+    response = create_order_single(props, fyers, trade["symbol"], qty, 1, 1, limit_price,
                                    0, 0, 0, {"retry_count_create_order": 1})
 
     if response["s"] == "ok":

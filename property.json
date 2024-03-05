@@ -84,25 +84,27 @@
   "active_position_check_interval": 5,
   "symbol_stock_info": [
     {
-      "symbol": "NSE:NIFTY50-INDEX",
-      "lot_size": 50,
-      "strike_displacement": 50
-    },
-    {
       "symbol": "NSE:NIFTYBANK-INDEX",
-      "lot_size": 25,
-      "strike_displacement": 100
+      "lot_size": 15,
+      "strike_displacement": 100,
+      "option_prefix": "BANKNIFTY"
     },
     {
       "symbol": "NSE:FINNIFTY-INDEX",
       "lot_size": 40,
-      "strike_displacement": 50
+      "strike_displacement": 50,
+      "option_prefix": "FINNIFTY"
+    },{
+      "symbol": "NSE:NIFTY50-INDEX",
+      "lot_size": 50,
+      "strike_displacement": 50,
+      "option_prefix": "NIFTY"
     }
   ],
   "chasing_values": [
     6,
-    15,
-    30,
+    13,
+    27,
     50
   ]
 }

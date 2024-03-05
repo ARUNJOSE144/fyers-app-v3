@@ -32,18 +32,18 @@ def get_access_token(props):
     file_name = "access_token/access_token_" + d + ".txt"
     if not os.path.exists(file_name):
         session = fyersModel.SessionModel(client_id=props["app_id"], secret_key=props["secret_id"],
-                                           redirect_uri=props["redirect_url"],
-                                           response_type="code", grant_type="authorization_code")
+                                          redirect_uri=props["redirect_url"],
+                                          response_type="code", grant_type="authorization_code")
         response = session.generate_authcode()
         write_log("Login url : " + response)
 
         auth_code = input("Enter Auth Code : ")
         session.set_token(auth_code)
         access_token = session.generate_token()['access_token']
-        with open(file_name, "w")as f:
+        with open(file_name, "w") as f:
             f.write(access_token)
     else:
-        with open(file_name, "r")as f:
+        with open(file_name, "r") as f:
             access_token = f.read()
     write_log("Access Token : " + access_token)
     return access_token
@@ -312,9 +312,9 @@ def update_status_by_id(id_to_update, new_status):
         parts = line.replace(" ", "").split('|')
         if len(parts) >= 6:
             current_id = parts[0]
-            current_status = parts[5]
+            current_status = parts[4]
             if current_id == str(id_to_update):
-                parts[5] = new_status
+                parts[4] = new_status
                 updated_line = ' | '.join(parts)
                 print("Before Update: ", updated_line)
                 updated_lines.append(updated_line)
@@ -360,3 +360,44 @@ def calculate_strike(props, trade, LTP_DATA):
 
     print("strike : ", strike)
     return strike
+
+
+def get_available_fund(fyers):
+    json = fyers.funds()
+    print(json)
+    available_balance_object = next((item for item in json['fund_limit'] if item['title'] == 'Available Balance'), None)
+    print(available_balance_object)
+    return available_balance_object["equityAmount"]
+
+
+def calculate_qty(fyers, props, trade):
+    qty = 1
+    capital_per = float(trade["capital_per"])
+    if "NIFTY" in trade["symbol"]:
+        # Assuming trade in options
+        if trade["qty"] == "AUTO":
+            available_capital = get_available_fund(fyers)
+            if capital_per > 50:
+                capital_per = 50
+            tradable_capital = (capital_per * available_capital) / 100
+            lot_size = get_lot_size(props, trade["symbol"])
+            price = float(trade["price"])
+            qty_lot = int((tradable_capital / price) / lot_size)
+            qty = qty_lot * lot_size
+
+        else:
+            qty = trade["qty"]
+    else:
+        qty = trade["qty"]
+
+    qty = int(qty)
+    print("QTY : ", qty)
+    return qty
+
+
+def get_lot_size(props, symbol):
+    symbol_list = props["symbol_stock_info"]
+    for obj in symbol_list:
+        if obj["option_prefix"] in symbol:
+            print("Lot Size : ", obj["lot_size"])
+            return int(obj["lot_size"])
