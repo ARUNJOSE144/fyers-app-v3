@@ -199,7 +199,7 @@ def manage_Active_Position():
                     stop_price = position["tradedPrice"] - getValueByPercentage(position["tradedPrice"], initial_sl);
 
                 stop_price = round_to_nearest_0_05(stop_price)
-                limit_price = round_to_nearest_0_05(stop_price - 0.05)
+                limit_price = round_to_nearest_0_05(stop_price - props["stop_limit_displacement"])
                 if stop_price > position["stop_price"]:
                     modify_order(props, fyers, position["stop_limit_order_id"], limit_price, stop_price,
                                  position["netQty"],
@@ -261,7 +261,7 @@ def check_for_new_active_positions():
                 initial_sl = chasing_values[0]
                 stop_price = round_to_nearest_0_05(
                     position["tradedPrice"] - getValueByPercentage(position["tradedPrice"], initial_sl))
-                limit_price = round_to_nearest_0_05(stop_price - 0.05)
+                limit_price = round_to_nearest_0_05(stop_price - props["stop_limit_displacement"])
                 log_message("limitPrice : " + str(position["symbol"]), 'INFO')
                 log_message("stop_price  : " + str(position["symbol"]), 'INFO')
                 # print("limitPrice :", limit_price)
