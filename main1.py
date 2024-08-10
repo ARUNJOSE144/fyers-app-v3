@@ -175,16 +175,40 @@ def manage_Active_Position():
     print("TIME : ", datetime.now().strftime("%H:%M:%S"), " LTP Data : ", LTP_DICT)
     if len(ACTIVE_POSITIONS) > 0:
         # print(" Active Positions Found")
+
         for position in ACTIVE_POSITIONS:
             chasing_values = props["chasing_values"]
             initial_sl = chasing_values[0]
             initial_displacement = chasing_values[1]
             initial_target = chasing_values[2]
             second_displacement = chasing_values[3]
-            if "last_updated_high" in position and position["last_updated_high"] < position["high"]:
+            final_target = chasing_values[4]
+
+            if "is_target_set" not in position:
+                position["is_target_set"] = False
+
+            print("Position before : ",position)
+            print("LTP_DICT[position[symbol]] : ", LTP_DICT[position["symbol"]])
+
+            change_percentage = getChangePercentage(position["tradedPrice"], position["high"])
+            ltp_change_percentage = getChangePercentage(position["tradedPrice"], LTP_DICT[position["symbol"]])
+
+            print("ltp_change_percentage : ", ltp_change_percentage)
+            if (final_target-15) < ltp_change_percentage:
+                if position["is_target_set"] is False:
+                    position["is_target_set"] = True
+                    print("case 4")
+                    limit_price = position["tradedPrice"] + (getValueByPercentage(position["tradedPrice"], final_target))
+                    print("limit_price : ", limit_price)
+                    modify_order(props, fyers, position["stop_limit_order_id"], limit_price, 0, position["netQty"], 1)
+
+                    if props["enable_sound"]:
+                        alertUser(TARGET_ORDER_PLACED)
+
+            elif position["is_target_set"] is True or ("last_updated_high" in position and position["last_updated_high"] < position["high"]):
                 position["last_updated_high"] = position["high"]
                 # chasing strategy= 10/15/30/50/100
-                change_percentage = getChangePercentage(position["tradedPrice"], position["high"])
+                position["is_target_set"] = False
                 print("Change % : ", change_percentage)
 
                 if change_percentage >= initial_target:
@@ -200,7 +224,7 @@ def manage_Active_Position():
 
                 stop_price = round_to_nearest_0_05(stop_price)
                 limit_price = round_to_nearest_0_05(stop_price - props["stop_limit_displacement"])
-                if stop_price > position["stop_price"]:
+                if stop_price >= position["stop_price"]:
                     modify_order(props, fyers, position["stop_limit_order_id"], limit_price, stop_price,
                                  position["netQty"],
                                  4)
