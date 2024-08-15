@@ -188,17 +188,20 @@ def manage_Active_Position():
                 position["is_target_set"] = False
 
             print("Position before : ",position)
-            print("LTP_DICT[position[symbol]] : ", LTP_DICT[position["symbol"]])
+            #print("LTP_DICT[position[symbol]] : ", LTP_DICT[position["symbol"]])
 
             change_percentage = getChangePercentage(position["tradedPrice"], position["high"])
-            ltp_change_percentage = getChangePercentage(position["tradedPrice"], LTP_DICT[position["symbol"]])
+            ltp_change_percentage = -1
+            if position["symbol"] in LTP_DICT:
+                ltp_change_percentage = getChangePercentage(position["tradedPrice"], LTP_DICT[position["symbol"]])
 
             print("ltp_change_percentage : ", ltp_change_percentage)
-            if (final_target-15) < ltp_change_percentage:
+            if final_target-props["sl_target_switch_displacement"] < ltp_change_percentage and ltp_change_percentage != -1:
                 if position["is_target_set"] is False:
                     position["is_target_set"] = True
                     print("case 4")
                     limit_price = position["tradedPrice"] + (getValueByPercentage(position["tradedPrice"], final_target))
+                    limit_price = round_to_nearest_0_05(limit_price)
                     print("limit_price : ", limit_price)
                     modify_order(props, fyers, position["stop_limit_order_id"], limit_price, 0, position["netQty"], 1)
 
