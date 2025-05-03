@@ -227,7 +227,7 @@ def manage_Active_Position():
 
                 stop_price = round_to_nearest_0_05(stop_price)
                 limit_price = round_to_nearest_0_05(stop_price - props["stop_limit_displacement"])
-                if stop_price >= position["stop_price"]:
+                if stop_price >= position["stop_price"] and ltp_change_percentage >= (initial_displacement-initial_sl):
                     modify_order(props, fyers, position["stop_limit_order_id"], limit_price, stop_price,
                                  position["netQty"],
                                  4)

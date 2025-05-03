@@ -2,11 +2,10 @@ import datetime
 
 import schedule
 from colorama import init
-from datetime import datetime, timedelta  # Import timedelta separately
-
+from datetime import datetime, timedelta, time  # Import timedelta separately
 
 from util import *
-import time
+import time as time_module  # Rename to avoid conflict
 
 props = {}
 LTP_DICT = {}
@@ -17,7 +16,6 @@ EXTERNAL_PENDING_TRADES = []
 LOCK = False
 trade_gap_counter = 0
 fyersWeb = ""
-CANDLE_TIME=1
 
 counter = 0
 fs = ""
@@ -39,10 +37,19 @@ get_available_fund(fyers)
 alertUser(INSIDE_CANDLE_FOUND)
 
 print("Start : ", datetime.now())
-SYMBOL = "NSE:NIFTY50-INDEX"
-CANDLE_COUNT = 25  # Last 6 candles
-PERCENTAGE_THRESHOLD = .15  # 1% range
+SYMBOL = props["consolidation_check_symbol_name"]
+CANDLE_COUNT = props["consolidation_check_candle_count"]  # Last 6 candles
+PERCENTAGE_THRESHOLD = props["consolidation_check_range_percent"]  # 1% range
+CANDLE_TIME = props["consolidation_check_candle_minutes"]
 
+def is_market_open():
+    """Returns True if the time is between 9:15 AM and 3:30 PM, else False."""
+    now = datetime.now().time()  # Get current time
+
+    market_open = time(9, 15)  # 9:15 AM
+    market_close = time(15, 30)  # 3:30 PM
+
+    return market_open <= now <= market_close
 
 def get_last_n_candles(n):
     """Fetch the last n 5-minute candles."""
@@ -59,6 +66,8 @@ def get_last_n_candles(n):
         "cont_flag": "1"
     }
 
+    print("Request:", data)
+
     response = fyers.history(data=data)
 
     if "candles" in response:
@@ -69,16 +78,31 @@ def get_last_n_candles(n):
 
 
 def check_candles_in_range():
+    global props
+    global SYMBOL
+    global CANDLE_COUNT
+    global PERCENTAGE_THRESHOLD
+    global CANDLE_TIME
     """Check if the last 6 candles' high-low percentage range is < 1%."""
+    props = load_properties()
+    SYMBOL = props["consolidation_check_symbol_name"]
+    CANDLE_COUNT = props["consolidation_check_candle_count"]  # Last 6 candles
+    PERCENTAGE_THRESHOLD = props["consolidation_check_range_percent"]  # 1% range
+    CANDLE_TIME = props["consolidation_check_candle_minutes"]
+
     print("Time : ", datetime.now())
     now = datetime.now()
-    if now.minute % CANDLE_TIME == 0:
-        candles = get_last_n_candles(CANDLE_COUNT)
-        print("candles : ", candles)
+    if is_market_open():
+        if now.minute % CANDLE_TIME == 0:
+            candles = get_last_n_candles(CANDLE_COUNT)
+            print("candles : ", candles)
+        else:
+            return
+        if not candles or len(candles) < CANDLE_COUNT:
+            print("Not enough data to analyze.")
+            return
     else:
-        return
-    if not candles or len(candles) < CANDLE_COUNT:
-        print("Not enough data to analyze.")
+        print("Market closed...")
         return
 
     highs = [candle[2] for candle in candles]  # Extract high prices
@@ -97,7 +121,8 @@ def check_candles_in_range():
         print("✅ The last " + str(CANDLE_COUNT) + " candles are " + str(round(range_percentage, 2)) + "  range ")
         alertUser(INSIDE_CANDLE_FOUND)
     else:
-        print("❌ The last " + str(CANDLE_COUNT) + " candles are not in " + str(round(range_percentage, 2)) + "range")
+        print("❌ The last " + str(CANDLE_COUNT) + " candles are in " + str(round(range_percentage, 2)) + "range")
+
 
 # Schedule function to run every 5 minutes
 schedule.every(1).minutes.at(":05").do(check_candles_in_range)
@@ -105,4 +130,7 @@ schedule.every(1).minutes.at(":05").do(check_candles_in_range)
 print("Inside Candle Checker Running...")
 while True:
     schedule.run_pending()
-    time.sleep(1)
+    time_module.sleep(1)
+
+
+
