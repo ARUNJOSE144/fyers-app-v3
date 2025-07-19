@@ -2,6 +2,8 @@ import json
 import os
 import threading
 from datetime import datetime
+import time
+import requests
 
 import mysql.connector
 from colorama import Fore, Back
@@ -401,3 +403,20 @@ def get_lot_size(props, symbol):
         if obj["option_prefix"] in symbol:
             print("Lot Size : ", obj["lot_size"])
             return int(obj["lot_size"])
+
+
+def is_internet_available(url='https://www.google.com', timeout=5):
+    try:
+        response = requests.get(url, timeout=timeout)
+        return response.status_code == 200
+    except requests.RequestException:
+        return False
+
+def internet_check_thread():
+    if not is_internet_available():
+        play_audio(INTERNET_NOT_AVAILABLE)
+        print(" Internet is NOT available.")
+        write_log(" Internet is NOT available.")
+
+    # Schedule the function to run again after 5 seconds
+    threading.Timer(5, internet_check_thread).start()

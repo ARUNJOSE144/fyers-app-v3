@@ -109,7 +109,7 @@ def start_trade(trade):
     global LOCK
     # strike = calculate_strike(props, trade, LTP_DICT)
     qty = calculate_qty(fyers, props, trade)
-    limit_price= float(trade["price"])
+    limit_price = float(trade["price"])
     response = create_order_single(props, fyers, trade["symbol"], qty, 1, 1, limit_price,
                                    0, 0, 0, {"retry_count_create_order": 1})
 
@@ -125,6 +125,7 @@ def start_trade(trade):
     load_pending_trades_from_file(False)
 
 
+internet_check_thread()
 load_pending_trades_from_file(True)
 load_property_from_file()
 check_for_the_trade_to_trigger()
@@ -187,8 +188,8 @@ def manage_Active_Position():
             if "is_target_set" not in position:
                 position["is_target_set"] = False
 
-            print("Position before : ",position)
-            #print("LTP_DICT[position[symbol]] : ", LTP_DICT[position["symbol"]])
+            print("Position before : ", position)
+            # print("LTP_DICT[position[symbol]] : ", LTP_DICT[position["symbol"]])
 
             change_percentage = getChangePercentage(position["tradedPrice"], position["high"])
             ltp_change_percentage = -1
@@ -196,11 +197,13 @@ def manage_Active_Position():
                 ltp_change_percentage = getChangePercentage(position["tradedPrice"], LTP_DICT[position["symbol"]])
 
             print("ltp_change_percentage : ", ltp_change_percentage)
-            if final_target-props["sl_target_switch_displacement"] < ltp_change_percentage and ltp_change_percentage != -1:
+            if final_target - props[
+                "sl_target_switch_displacement"] < ltp_change_percentage and ltp_change_percentage != -1:
                 if position["is_target_set"] is False:
                     position["is_target_set"] = True
                     print("case 4")
-                    limit_price = position["tradedPrice"] + (getValueByPercentage(position["tradedPrice"], final_target))
+                    limit_price = position["tradedPrice"] + (
+                        getValueByPercentage(position["tradedPrice"], final_target))
                     limit_price = round_to_nearest_0_05(limit_price)
                     print("limit_price : ", limit_price)
                     modify_order(props, fyers, position["stop_limit_order_id"], limit_price, 0, position["netQty"], 1)
@@ -208,7 +211,8 @@ def manage_Active_Position():
                     if props["enable_sound"]:
                         alertUser(TARGET_ORDER_PLACED)
 
-            elif position["is_target_set"] is True or ("last_updated_high" in position and position["last_updated_high"] < position["high"]):
+            elif position["is_target_set"] is True or (
+                    "last_updated_high" in position and position["last_updated_high"] < position["high"]):
                 position["last_updated_high"] = position["high"]
                 # chasing strategy= 10/15/30/50/100
                 position["is_target_set"] = False
@@ -223,11 +227,12 @@ def manage_Active_Position():
                     stop_price = position["high"] - getValueByPercentage(position["tradedPrice"], initial_displacement)
                 else:
                     print("case 3")
-                    stop_price = position["tradedPrice"] - getValueByPercentage(position["tradedPrice"], initial_sl);
+                    stop_price = position["tradedPrice"] - getValueByPercentage(position["tradedPrice"], initial_sl)
 
                 stop_price = round_to_nearest_0_05(stop_price)
                 limit_price = round_to_nearest_0_05(stop_price - props["stop_limit_displacement"])
-                if stop_price >= position["stop_price"] and ltp_change_percentage >= (initial_displacement-initial_sl):
+                if stop_price >= position["stop_price"] and ltp_change_percentage >= (
+                        initial_displacement - initial_sl):
                     modify_order(props, fyers, position["stop_limit_order_id"], limit_price, stop_price,
                                  position["netQty"],
                                  4)

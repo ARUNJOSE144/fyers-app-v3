@@ -15,9 +15,6 @@
   "enable_sound": true,
   "strike_prefix": "23413",
   "SYMBOL_FOR_LTP_MAP": [
-    "NSE:NIFTY50-INDEX",
-    "NSE:NIFTYBANK-INDEX",
-    "NSE:FINNIFTY-INDEX"
   ],
   "auto_trade_enabled": true,
   "auto_trade_commons": {
@@ -108,12 +105,12 @@
   "consolidation_check_candle_count": 25,
   "consolidation_check_range_percent": 0.15,
 
-  "sl_target_switch_displacement": 20,
+  "sl_target_switch_displacement": 8,
   "chasing_values": [
-    10,
-    20,
-    40,
+    7,
+    30,
+    100,
     50,
-    150
+    50
   ]
 }
