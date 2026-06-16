@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import threading
 from datetime import datetime
 import time
@@ -250,7 +251,21 @@ def get_obj_from_array(list, field_name, value):
 
 def play_audio(file_path):
     try:
-        playsound(file_path)
+        abs_path = os.path.abspath(file_path)
+        ps_cmd = (
+            "Add-Type -AssemblyName presentationCore;"
+            f"$mp = [System.Windows.Media.MediaPlayer]::new();"
+            f"$mp.Open([System.Uri]'{abs_path}');"
+            "$mp.Play();"
+            "Start-Sleep -Seconds 5;"
+            "$mp.Stop();"
+            "$mp.Close()"
+        )
+        subprocess.Popen(
+            ["powershell", "-WindowStyle", "Hidden", "-Command", ps_cmd],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
     except Exception as e:
         log_message("Error While playing alert", "WARNING")
 

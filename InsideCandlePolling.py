@@ -2,10 +2,10 @@ import datetime
 
 import schedule
 from colorama import init
-from datetime import datetime, timedelta, time  # Import timedelta separately
 
 from util import *
-import time as time_module  # Rename to avoid conflict
+from datetime import datetime, timedelta, time  # Import after wildcard to avoid shadowing by util's `time` module
+import time as time_module
 
 props = {}
 LTP_DICT = {}
@@ -34,7 +34,6 @@ write_log(json.dumps(fyers.tradebook()))
 write_log(json.dumps(fyers.orderbook()))
 write_log(json.dumps(fyers.positions()))
 get_available_fund(fyers)
-alertUser(INSIDE_CANDLE_FOUND)
 
 print("Start : ", datetime.now())
 SYMBOL = props["consolidation_check_symbol_name"]
