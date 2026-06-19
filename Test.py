@@ -1,4 +1,4 @@
-from playsound import playsound
+from playsound3 import playsound
 
 from constants import SL_UPDATED_SUCCESS, STOP_LOSS_UPDATED_SUCCESS
 

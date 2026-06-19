@@ -9,7 +9,7 @@ import requests
 import mysql.connector
 from colorama import Fore, Back
 from fyers_apiv3 import fyersModel
-from playsound import playsound
+from playsound3 import playsound
 from prettytable import PrettyTable
 
 from common import get_object_from_list, get_comma_separated_symbols, write_log
